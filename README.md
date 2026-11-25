@@ -17,12 +17,15 @@ pnpm install
 cp .env.example .env
 docker compose up -d          # PostgreSQL 16 sur le port 5433
 pnpm db:migrate               # applique les migrations
+pnpm db:generate              # génère le client Prisma
 pnpm db:seed                  # données de démonstration « Atlas Digital »
 pnpm dev                      # http://localhost:3000
 ```
 
-Sans PostgreSQL : `DEMO_IN_MEMORY=1` dans `.env` démarre l’application avec des dépôts en mémoire,
-déjà remplis avec les données de démonstration (perdues au redémarrage).
+Avec Prisma 7, `pnpm db:migrate` applique les migrations. Lancez `pnpm db:generate` séparément pour générer le client.
+
+Pour démarrer sans PostgreSQL, définissez `DEMO_IN_MEMORY=1` dans `.env`, puis exécutez `pnpm db:generate` et `pnpm dev`.
+L’application charge automatiquement les données de démonstration en mémoire. Les modifications sont perdues au redémarrage.
 
 ## Configuration (`.env.example`)
 

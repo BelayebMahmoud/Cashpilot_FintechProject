@@ -1,0 +1,17 @@
+node_modules
+.turbo
+.next
+out
+dist
+coverage
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+!.env.example
+packages/db/src/generated
+storage
+playwright-report
+test-results
+*.pdf
+.DS_Store

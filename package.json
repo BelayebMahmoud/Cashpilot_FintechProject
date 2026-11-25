@@ -1,0 +1,30 @@
+{
+  "name": "cashpilot",
+  "private": true,
+  "packageManager": "pnpm@10.34.9",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "turbo run dev --filter=@cashpilot/web",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "db:generate": "pnpm --filter @cashpilot/db db:generate",
+    "db:migrate": "pnpm --filter @cashpilot/db db:migrate",
+    "db:deploy": "pnpm --filter @cashpilot/db db:deploy",
+    "db:seed": "pnpm --filter @cashpilot/db db:seed",
+    "depcruise": "depcruise packages apps --config .dependency-cruiser.cjs",
+    "format": "prettier --write .",
+    "verify": "turbo run lint typecheck test build && pnpm depcruise"
+  },
+  "devDependencies": {
+    "dependency-cruiser": "18.9.0",
+    "prettier": "3.6.2",
+    "turbo": "2.11.13",
+    "typescript": "5.9.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["@prisma/engines", "prisma", "esbuild", "sharp", "@tailwindcss/oxide", "unrs-resolver"]
+  }
+}

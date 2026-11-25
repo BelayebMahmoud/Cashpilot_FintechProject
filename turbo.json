@@ -1,0 +1,18 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [".env"],
+  "globalEnv": ["NODE_ENV"],
+  "tasks": {
+    "db:generate": { "cache": false, "outputs": ["src/generated/**"] },
+    "build": {
+      "dependsOn": ["^build", "@cashpilot/db#db:generate"],
+      "env": ["DATABASE_URL", "BETTER_AUTH_SECRET", "BETTER_AUTH_URL", "NEXT_PUBLIC_APP_URL", "STORAGE_DIR", "APP_TIMEZONE", "DEMO_IN_MEMORY"],
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+    },
+    "lint": { "dependsOn": ["@cashpilot/db#db:generate"] },
+    "typecheck": { "dependsOn": ["@cashpilot/db#db:generate"] },
+    "test": { "dependsOn": ["@cashpilot/db#db:generate"], "env": ["TEST_DATABASE_URL", "TZ"], "outputs": ["coverage/**"] },
+    "test:e2e": { "dependsOn": ["build"], "cache": false, "env": ["DATABASE_URL", "BETTER_AUTH_SECRET", "BETTER_AUTH_URL", "DEMO_IN_MEMORY", "E2E_BASE_URL"] },
+    "dev": { "cache": false, "persistent": true }
+  }
+}

@@ -4,6 +4,7 @@ node_modules
 **/.turbo
 .git
 .env
+.env.local
 **/test-results
 **/playwright-report
 storage

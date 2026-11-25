@@ -1,12 +1,15 @@
-import { config } from 'dotenv';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { defineConfig } from 'prisma/config';
+import { loadEnvFile } from 'node:process';
+import type { PrismaConfig } from 'prisma/config';
 
 // Prisma 7 does not load .env by itself: read the package's .env, then the repo root's.
-config({ path: path.resolve(import.meta.dirname, '.env'), quiet: true });
-config({ path: path.resolve(import.meta.dirname, '../../.env'), quiet: true });
+for (const filename of ['.env', '../../.env']) {
+  const envPath = path.resolve(import.meta.dirname, filename);
+  if (existsSync(envPath)) loadEnvFile(envPath);
+}
 
-export default defineConfig({
+export default {
   schema: 'prisma/schema.prisma',
   migrations: {
     path: 'prisma/migrations',
@@ -16,4 +19,4 @@ export default defineConfig({
     // `prisma generate` does not need a live database; migrate/deploy do.
     url: process.env.DATABASE_URL ?? 'postgresql://cashpilot:cashpilot@localhost:5433/cashpilot',
   },
-});
+} satisfies PrismaConfig;

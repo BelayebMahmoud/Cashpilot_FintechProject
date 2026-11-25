@@ -173,9 +173,6 @@ importers:
       '@prisma/client':
         specifier: 7.10.1
         version: 7.10.1(prisma@7.10.1(@types/node@22.19.1)(@types/react-dom@19.2.7(@types/react@19.3.2))(@types/react@19.3.2)(magicast@0.5.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@5.9.3))(typescript@5.9.3)
-      dotenv:
-        specifier: 17.4.2
-        version: 17.4.2
       pg:
         specifier: 8.23.1
         version: 8.23.1

@@ -31,10 +31,11 @@ export interface Container {
 }
 
 async function build(): Promise<Container> {
-  loadEnvConfig(path.resolve(process.cwd(), '../..')); // the single .env lives at the monorepo root
+  const rootDir = path.resolve(process.cwd(), '../..');
+  loadEnvConfig(rootDir); // the single .env lives at the monorepo root
   const config = env(); // fails fast on invalid configuration
   const logger = new JsonLogger({ app: 'cashpilot' });
-  const storageDir = path.resolve(process.cwd(), config.STORAGE_DIR);
+  const storageDir = path.resolve(rootDir, config.STORAGE_DIR);
 
   if (config.DEMO_IN_MEMORY === '1') {
     const clock = new SystemClock(config.APP_TIMEZONE);

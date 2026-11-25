@@ -7,8 +7,9 @@ import { container } from '@/container';
 
 /** Signed-in user for this request (deduplicated per render with React `cache`). */
 export const getSessionUser = cache(async (): Promise<UserView | null> => {
+  const requestHeaders = await headers();
   const { sessions } = await container();
-  return sessions.currentUser(await headers());
+  return sessions.currentUser(requestHeaders);
 });
 
 export async function requireUser(): Promise<UserView> {

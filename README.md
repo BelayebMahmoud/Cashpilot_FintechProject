@@ -61,9 +61,38 @@ Mot de passe commun : **`CashPilot2026!`**
 | Gestionnaire financier (`FINANCE_MANAGER`) | `gestion@cashpilot.demo` | Factures, encaissements, paiements, prévisions |
 | Collaborateur (`EMPLOYEE`) | `collab@cashpilot.demo` | « Mes dépenses » (soumission mobile) |
 
-Scénario de soutenance : créer un compte → créer une entreprise (5 000 DT) → inviter `gestion@` et `collab@` →
-facture de 3 000 DT à J+10 → encaissement partiel de 1 000 DT → dépense de 6 000 DT soumise puis approuvée →
-prévision → simulation d’un retard de 20 jours → comparaison. Il est automatisé dans `apps/web/e2e/soutenance.spec.ts`.
+## Scénario de soutenance
+
+Prenez le jour de la démonstration comme **J**, avec les comptes de démonstration disponibles. Créez une nouvelle entreprise
+pour partir d’un solde connu et éviter que les flux d’Atlas Digital entrent dans le calcul.
+
+1. **Dirigeant** — Inscrivez-vous avec un nouveau compte et créez une entreprise avec **5 000 DT** de solde initial.
+   Dans **Entreprise → Membres**, ajoutez `gestion@cashpilot.demo` comme gestionnaire financier et
+   `collab@cashpilot.demo` comme collaborateur. Vérifiez que la trésorerie affiche **5 000 DT**.
+2. **Gestionnaire financier** — Connectez-vous avec `gestion@cashpilot.demo` et sélectionnez la nouvelle entreprise.
+   Créez un client et validez une facture de **3 000 DT** à 0 % de TVA, avec une échéance à **J+10**.
+   Enregistrez un encaissement de **1 000 DT** daté de **J**. La facture passe à **Partiellement payée**,
+   le reste à payer est de **2 000 DT** et le solde réel passe à **6 000 DT**.
+3. **Collaborateur** — Connectez-vous avec `collab@cashpilot.demo` et sélectionnez la même entreprise.
+   Soumettez une dépense de **6 000 DT** avec une catégorie, un justificatif et une échéance à **J+15**.
+   Vérifiez qu’elle apparaît comme **Soumise · à valider** dans **Mes dépenses**.
+4. **Dirigeant** — Reconnectez-vous avec le compte créé à la première étape. Approuvez la dépense, puis laissez-la
+   au statut **Approuvée** pour qu’elle reste dans les décaissements prévus. Le solde réel est toujours de **6 000 DT**.
+5. **Dirigeant** — Ouvrez **Prévisions** à 30 jours. Le solde prévu à **J+30** est de **2 000 DT** après avoir ajouté
+   les **2 000 DT** à encaisser au solde réel de **6 000 DT** et déduit les **6 000 DT** à décaisser.
+6. **Dirigeant** — Dans **Simulations**, ajoutez l’hypothèse **Retarder un encaissement** et décalez la facture
+   de **20 jours**, de **J+10** à **J+30**. Comparez les deux courbes, enregistrez le scénario et vérifiez
+   que le solde réel reste à **6 000 DT** dans **Trésorerie**.
+
+| Date | Prévision de référence | Scénario avec retard |
+|---|---:|---:|
+| J | 6 000 DT | 6 000 DT |
+| J+10 | 8 000 DT | 6 000 DT |
+| J+15 | 2 000 DT | 0 DT |
+| J+30 | 2 000 DT | 2 000 DT |
+
+Le retard fait passer le point bas de **2 000 DT** à **0 DT**. Les deux scénarios aboutissent à **2 000 DT** à J+30.
+Le [test Playwright de soutenance](apps/web/e2e/soutenance.spec.ts) automatise ce parcours.
 
 ## Scripts
 

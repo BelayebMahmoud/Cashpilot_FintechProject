@@ -1,0 +1,446 @@
+// CashPilot — complete data model.
+// Amounts are BigInt millimes (1 DT = 1 000); calendar dates are @db.Date.
+// Every tenant table carries companyId + an index starting with it.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ───────────────────────── Auth (Better Auth) ─────────────────────────
+
+model User {
+  id            String       @id
+  name          String
+  email         String       @unique
+  emailVerified Boolean      @default(false)
+  image         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  memberships   Membership[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model RateLimit {
+  id          String @id
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+
+  @@map("rateLimit")
+}
+
+// ───────────────────────── Entreprise et accès ─────────────────────────
+
+enum Sector {
+  DIGITAL_AGENCY
+  TRAINING_CENTER
+  RETAIL
+  SERVICES
+}
+
+enum Role {
+  OWNER
+  FINANCE_MANAGER
+  EMPLOYEE
+}
+
+model Company {
+  id                    String   @id
+  name                  String
+  slug                  String   @unique
+  sector                Sector
+  openingBalanceMillimes BigInt
+  openingDate           DateTime @db.Date
+  stampDutyMillimes     BigInt   @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  memberships   Membership[]
+  parties       Party[]
+  invoices      Invoice[]
+  expenses      Expense[]
+  movements     CashMovement[]
+  plannedFlows  PlannedFlow[]
+  scenarios     Scenario[]
+  projects      Project[]
+  auditEntries  AuditEntry[]
+}
+
+model Membership {
+  userId    String
+  companyId String
+  role      Role
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@id([userId, companyId])
+  @@index([companyId])
+}
+
+// ───────────────────────── Clients et fournisseurs ─────────────────────────
+
+enum PartyKind {
+  CLIENT
+  SUPPLIER
+}
+
+model Party {
+  id        String    @id
+  companyId String
+  kind      PartyKind
+  name      String
+  email     String?
+  phone     String?
+  address   String?
+  taxId     String?
+  notes     String?
+  archived  Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  company   Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  invoices  Invoice[]
+  expenses  Expense[]
+  projects  Project[]
+
+  @@index([companyId, kind])
+}
+
+// ───────────────────────── Facturation & encaissements ─────────────────────────
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  TRANSFER
+  CHEQUE
+  CASH
+  CARD
+  OTHER
+}
+
+model Invoice {
+  id                String        @id
+  companyId         String
+  clientId          String
+  projectId         String?
+  number            String?
+  status            InvoiceStatus
+  issueDate         DateTime      @db.Date
+  dueDate           DateTime      @db.Date
+  /// Denormalised total for SQL aggregates (computed by the domain at each save).
+  totalMillimes     BigInt
+  stampDutyMillimes BigInt        @default(0)
+  notes             String?
+  cancelReason      String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  company           Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  client            Party         @relation(fields: [clientId], references: [id])
+  project           Project?      @relation(fields: [projectId], references: [id])
+  lines             InvoiceLine[]
+  payments          Payment[]
+
+  @@unique([companyId, number])
+  @@index([companyId, status, dueDate])
+  @@index([companyId, clientId])
+}
+
+model InvoiceLine {
+  id            String  @id
+  invoiceId     String
+  position      Int
+  description   String
+  qtyHundredths Int
+  unitMillimes  BigInt
+  vatRateBp     Int
+  invoice       Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+}
+
+/// Gapless numbering: one row per company and year, incremented inside the validation transaction.
+model InvoiceCounter {
+  companyId String
+  year      Int
+  value     Int
+
+  @@id([companyId, year])
+}
+
+model Payment {
+  id             String        @id
+  companyId      String
+  invoiceId      String
+  amountMillimes BigInt
+  date           DateTime      @db.Date
+  method         PaymentMethod
+  /// A reversal points to the payment it cancels; unique → a payment can be reversed only once.
+  reversesId     String?       @unique
+  reason         String?
+  createdById    String
+  createdAt      DateTime      @default(now())
+  invoice        Invoice       @relation(fields: [invoiceId], references: [id])
+
+  @@index([companyId, invoiceId])
+}
+
+// ───────────────────────── Dépenses ─────────────────────────
+
+enum ExpenseStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+  PAID
+}
+
+enum ExpenseCategory {
+  RENT
+  SALARIES
+  SUPPLIES
+  SOFTWARE
+  MARKETING
+  TRAVEL
+  SUBCONTRACTING
+  TAXES
+  OTHER
+}
+
+model Expense {
+  id             String          @id
+  companyId      String
+  submittedById  String
+  supplierId     String?
+  projectId      String?
+  label          String
+  category       ExpenseCategory
+  amountMillimes BigInt
+  expenseDate    DateTime        @db.Date
+  dueDate        DateTime?       @db.Date
+  note           String?
+  receiptKey     String?
+  receiptName    String?
+  receiptMime    String?
+  receiptSize    Int?
+  status         ExpenseStatus
+  submittedAt    DateTime?       @db.Date
+  decidedById    String?
+  decidedAt      DateTime?       @db.Date
+  rejectReason   String?
+  selfApproved   Boolean         @default(false)
+  paymentRef     String?
+  paidAt         DateTime?       @db.Date
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  company        Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  supplier       Party?          @relation(fields: [supplierId], references: [id])
+  project        Project?        @relation(fields: [projectId], references: [id])
+
+  @@index([companyId, status])
+  @@index([companyId, submittedById])
+}
+
+// ───────────────────────── Trésorerie (append-only ledger) ─────────────────────────
+
+enum Direction {
+  IN
+  OUT
+}
+
+enum MovementSource {
+  OPENING
+  PAYMENT
+  PAYMENT_REVERSAL
+  EXPENSE_PAYMENT
+  EXPENSE_PAYMENT_REVERSAL
+  ADJUSTMENT
+}
+
+model CashMovement {
+  id             String         @id
+  /// Insertion order: tie-breaker for the running balance within a day.
+  seq            Int            @unique @default(autoincrement())
+  companyId      String
+  direction      Direction
+  amountMillimes BigInt
+  date           DateTime       @db.Date
+  label          String
+  sourceType     MovementSource
+  /// Id of the operation (payment, reversal, expense payment ref…): an operation hits the balance once.
+  sourceId       String
+  documentId     String?
+  reason         String?
+  createdById    String
+  createdAt      DateTime       @default(now())
+  company        Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceType, sourceId])
+  @@index([companyId, date])
+}
+
+// ───────────────────────── Prévisions & simulation ─────────────────────────
+
+enum Recurrence {
+  NONE
+  MONTHLY
+}
+
+model PlannedFlow {
+  id             String     @id
+  companyId      String
+  direction      Direction
+  amountMillimes BigInt
+  expectedDate   DateTime   @db.Date
+  label          String
+  recurrence     Recurrence
+  endDate        DateTime?  @db.Date
+  cancelled      Boolean    @default(false)
+  createdById    String
+  createdAt      DateTime   @default(now())
+  company        Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+/// Scenarios live apart: never joined into nor written to the real tables.
+model Scenario {
+  id          String   @id
+  companyId   String
+  name        String
+  baseDate    DateTime @db.Date
+  horizonDays Int
+  assumptions Json
+  adjustments Json
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+}
+
+// ───────────────────────── Alertes & traçabilité ─────────────────────────
+
+model AlertDismissal {
+  companyId String
+  userId    String
+  key       String
+  createdAt DateTime @default(now())
+
+  @@id([companyId, userId, key])
+}
+
+model AuditEntry {
+  id         String   @id
+  companyId  String
+  actorId    String
+  action     String
+  entityType String
+  entityId   String
+  before     Json?
+  after      Json?
+  at         DateTime @default(now())
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId, at])
+}
+
+// ───────────────────────── Secteur : agence digitale ─────────────────────────
+
+enum ProjectStatus {
+  ACTIVE
+  CLOSED
+}
+
+model Project {
+  id             String        @id
+  companyId      String
+  clientId       String
+  name           String
+  budgetMillimes BigInt
+  startDate      DateTime      @db.Date
+  endDate        DateTime?     @db.Date
+  status         ProjectStatus @default(ACTIVE)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  company        Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  client         Party         @relation(fields: [clientId], references: [id])
+  milestones     Milestone[]
+  invoices       Invoice[]
+  expenses       Expense[]
+
+  @@index([companyId])
+}
+
+model Milestone {
+  id             String   @id
+  projectId      String
+  position       Int
+  label          String
+  amountMillimes BigInt
+  expectedDate   DateTime @db.Date
+  invoiceId      String?
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}

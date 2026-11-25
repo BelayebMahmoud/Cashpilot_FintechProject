@@ -1,0 +1,1 @@
+{ "extends": "@cashpilot/config/tsconfig/library.json", "include": ["src", "test", "vitest.config.ts"] }

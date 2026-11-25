@@ -1,0 +1,22 @@
+{
+  "name": "@cashpilot/domain",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@cashpilot/config": "workspace:*",
+    "@types/node": "22.19.1",
+    "@vitest/coverage-v8": "5.1.2",
+    "eslint": "9.39.1",
+    "typescript": "5.9.3",
+    "vitest": "5.1.2"
+  }
+}

@@ -20,8 +20,8 @@ export function ForecastExplorer({ data }: { data: ForecastDto }) {
   const labels = flowLabelMap(data.flows); // memoised by the React Compiler
 
   return (
-    <div className={cn('space-y-6', pending && 'opacity-70 transition-opacity')}>
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div className={cn('min-w-0 space-y-4 sm:space-y-6', pending && 'opacity-70 transition-opacity')}>
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border bg-card p-3 sm:px-4">
         <ToggleGroup type="single" value={String(data.horizon)} onValueChange={(v) => v && set({ horizon: v === '30' ? undefined : v })} aria-label="Horizon de prévision">
           {['30', '60', '90'].map((h) => (
             <ToggleGroupItem key={h} value={h} aria-label={`${h} jours`}>
@@ -29,31 +29,41 @@ export function ForecastExplorer({ data }: { data: ForecastDto }) {
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
-        <div className="flex flex-wrap items-center gap-4" role="group" aria-label="Hypothèses">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-3" role="group" aria-label="Hypothèses">
+          <div className="flex min-w-0 items-center gap-2">
             <Switch
               id="overdue-policy"
               checked={data.assumptions.overduePolicy === 'ROLL_TO_TODAY'}
               onCheckedChange={(v) => set({ overdue: v ? undefined : 'exclude' })}
             />
-            <Label htmlFor="overdue-policy">Inclure les retards (reportés à aujourd’hui)</Label>
+            <Label htmlFor="overdue-policy">Reporter les retards à aujourd’hui</Label>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2">
             <Switch id="pending" checked={data.assumptions.includePendingExpenses} onCheckedChange={(v) => set({ pending: v ? undefined : '0' })} />
             <Label htmlFor="pending">Inclure les dépenses en attente</Label>
           </div>
         </div>
       </div>
 
-      <Card>
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-semibold">Solde prévisionnel — {data.horizon} jours</h2>
-          <p className="text-sm text-muted-foreground">
-            Fin de période : <strong className={cn(p.endBalanceMillimes < 0 && 'text-danger')}>{formatMoney(p.endBalanceMillimes)}</strong> · point bas :{' '}
-            <strong className={cn(p.min.balanceMillimes < 0 && 'text-danger')}>{formatMoney(p.min.balanceMillimes)}</strong> le {formatDate(p.min.date, 'short')}
-          </p>
+      <Card className="min-w-0 gap-4 rounded-xl p-4 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+          <h2 className="text-lg font-medium">Solde prévisionnel — {data.horizon} jours</h2>
+          <p className="text-xs text-muted-foreground">Sélectionnez une date sur le graphique pour voir le calcul</p>
         </div>
-        <p className="text-xs text-muted-foreground">Cliquez sur un jour du graphique pour voir le détail du calcul.</p>
+        <dl className="grid gap-4 border-y py-4 sm:grid-cols-2 sm:gap-0 sm:divide-x">
+          <div className="min-w-0 sm:pr-5">
+            <dt className="text-xs text-muted-foreground">Fin de période : </dt>
+            <dd className={cn('mt-1 font-mono text-2xl font-medium wrap-anywhere tabular-nums sm:text-3xl', p.endBalanceMillimes < 0 && 'text-danger-foreground')}>
+              {formatMoney(p.endBalanceMillimes)}
+            </dd>
+          </div>
+          <div className="min-w-0 sm:pl-5">
+            <dt className="text-xs text-muted-foreground">Point bas · {formatDate(p.min.date, 'short')}</dt>
+            <dd className={cn('mt-1 font-mono text-xl font-medium wrap-anywhere tabular-nums sm:text-2xl', p.min.balanceMillimes < 0 && 'text-danger-foreground')}>
+              {formatMoney(p.min.balanceMillimes)}
+            </dd>
+          </div>
+        </dl>
         <ForecastChart points={p.points} shortfalls={p.shortfalls} today={data.today} flowLabels={labels} onSelectDate={setSelected} selectedDate={date} />
       </Card>
 

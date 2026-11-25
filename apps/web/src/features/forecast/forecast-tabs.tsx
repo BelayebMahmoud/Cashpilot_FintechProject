@@ -9,7 +9,7 @@ export function ForecastTabs({ company, active }: { company: string; active: 'fo
   ] as const;
   return (
     <nav aria-label="Sections de la prévision">
-      <ul className="inline-flex gap-1 rounded-lg bg-muted p-1">
+      <ul className="inline-flex gap-1 rounded-lg border bg-muted p-1">
         {items.map((i) => (
           <li key={i.key}>
             <Link
@@ -17,7 +17,7 @@ export function ForecastTabs({ company, active }: { company: string; active: 'fo
               aria-current={active === i.key ? 'page' : undefined}
               className={cn(
                 'inline-flex h-8 items-center rounded-md px-3 text-sm font-medium text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring',
-                active === i.key && 'bg-card text-foreground shadow-sm',
+                active === i.key && 'bg-card text-foreground ring-1 ring-border ring-inset',
               )}
             >
               {i.label}

@@ -27,17 +27,18 @@ export default async function ForecastPage({ params, searchParams }: PageProps<'
   const weeks = r.value.weeks;
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-7xl space-y-6">
       <PageHeader
         title="Prévisions"
-        description="Solde prévisionnel = solde réel + encaissements restant attendus − décaissements prévus, jour par jour."
+        description="Suivez le solde réel et l’effet des encaissements et décaissements prévus"
         actions={<ForecastTabs company={company} active="forecast" />}
       />
       <ForecastExplorer data={r.value} />
-      <Card className="gap-0 p-0">
+      <Card className="min-w-0 gap-0 rounded-xl p-0">
+        <h2 className="border-b px-4 py-4 text-sm font-medium sm:px-6">Flux par semaine</h2>
         <Table>
           <TableCaption>Flux prévus regroupés par semaine</TableCaption>
-          <TableHeader>
+          <TableHeader className="bg-muted/50">
             <TableRow>
               <TableHead>Semaine du</TableHead>
               <TableHead>Flux</TableHead>
@@ -49,7 +50,7 @@ export default async function ForecastPage({ params, searchParams }: PageProps<'
           <TableBody>
             {weeks.map((w) => (
               <TableRow key={w.weekStart} className="align-top">
-                <TableCell className="whitespace-nowrap">{formatDate(w.weekStart)}</TableCell>
+                <TableCell className="font-mono text-xs whitespace-nowrap">{formatDate(w.weekStart)}</TableCell>
                 <TableCell>
                   {w.flows.length === 0 ? (
                     <span className="text-muted-foreground">—</span>
@@ -70,7 +71,7 @@ export default async function ForecastPage({ params, searchParams }: PageProps<'
                 <TableCell numeric>{w.inMillimes ? <Amount value={w.inMillimes} signed /> : '—'}</TableCell>
                 <TableCell numeric>{w.outMillimes ? <Amount value={-w.outMillimes} /> : '—'}</TableCell>
                 <TableCell numeric>
-                  <Amount value={w.endBalanceMillimes} tone="balance" />
+                  <Amount value={w.endBalanceMillimes} tone="balance" className="font-mono font-medium" />
                 </TableCell>
               </TableRow>
             ))}

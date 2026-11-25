@@ -4,8 +4,8 @@ import { ThemeToggle } from '@/components/theme-provider';
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="flex h-14 items-center justify-between px-4 md:px-8">
-        <div className="flex items-center gap-2 font-semibold">
+      <header className="flex h-16 items-center justify-between border-b px-4 md:px-8">
+        <div className="flex items-center gap-3 font-semibold">
           <span className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground" aria-hidden>
             <ArrowLeftRight className="size-4" />
           </span>
@@ -13,10 +13,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         </div>
         <ThemeToggle />
       </header>
-      <main id="main" className="flex flex-1 items-center justify-center px-4 py-10">
+      <main id="main" className="flex flex-1 items-start justify-center px-4 py-12 sm:items-center sm:px-6 sm:py-16">
         <div className="w-full max-w-md">{children}</div>
       </main>
-      <footer className="px-4 pb-6 text-center text-xs text-muted-foreground">Trésorerie claire, décisions sereines.</footer>
     </div>
   );
 }

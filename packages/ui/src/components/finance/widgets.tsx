@@ -27,14 +27,14 @@ export function KpiCard({ label, value, tone = 'neutral', hint, icon, href, link
         <span>{label}</span>
         {icon && <span aria-hidden className="[&_svg]:size-4">{icon}</span>}
       </div>
-      <Amount value={value} tone={tone} size="xl" />
+      <Amount value={value} tone={tone} size="lg" className="font-mono font-medium tracking-tight whitespace-normal wrap-anywhere xl:text-[1.375rem]" />
       {hint && <div className="text-xs text-muted-foreground">{hint}</div>}
     </>
   );
   return (
     <Card className={cn('gap-2', href && 'transition-colors hover:bg-accent/40', className)}>
       {href ? (
-        <Link href={href} className="flex flex-col gap-2 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring">
+        <Link href={href} className="flex flex-1 flex-col gap-2 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring">
           {body}
         </Link>
       ) : (
@@ -67,7 +67,7 @@ export function RunwayGauge({ days, firstNegativeDate, horizon = 90, className }
         <span>Autonomie de trésorerie</span>
         <Wallet className="size-4" aria-hidden />
       </div>
-      <div className="text-[2rem] leading-none font-semibold tracking-tight tabular-nums">{label}</div>
+      <div className="font-mono text-xl leading-tight font-medium tracking-tight tabular-nums xl:text-[1.375rem]">{label}</div>
       <div
         role="meter"
         aria-label="Autonomie de trésorerie"
@@ -78,7 +78,7 @@ export function RunwayGauge({ days, firstNegativeDate, horizon = 90, className }
         className="flex gap-0.5"
       >
         {Array.from({ length: segments }, (_, i) => (
-          <span key={i} className={cn('h-2 flex-1 rounded-sm', i < filled ? color : 'bg-muted')} />
+          <span key={i} className={cn('h-1 flex-1 rounded-sm', i < filled ? color : 'bg-muted')} />
         ))}
       </div>
       <p className="text-xs text-muted-foreground">
@@ -109,7 +109,7 @@ export function PageHeader({ title, description, breadcrumb, actions, className 
     <header className={cn('flex flex-col gap-3 md:flex-row md:items-end md:justify-between', className)}>
       <div className="min-w-0 space-y-1">
         {breadcrumb && <nav aria-label="Fil d'Ariane" className="text-sm text-muted-foreground">{breadcrumb}</nav>}
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+        <h1 className="text-[1.75rem] leading-tight font-medium tracking-tight sm:text-[2rem]">{title}</h1>
         {description && <p className="text-sm text-muted-foreground">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}

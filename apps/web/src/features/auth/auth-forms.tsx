@@ -4,7 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { type Route } from 'next';
-import { CircleAlert, Info } from 'lucide-react';
+import { CircleAlert } from 'lucide-react';
 import { Alert, AlertDescription, Button, Card, Field, Input } from '@cashpilot/ui';
 import { authClient } from '@/lib/auth-client';
 
@@ -37,10 +37,10 @@ export function LoginForm({ demoAccounts }: { demoAccounts: { email: string; lab
   }
 
   return (
-    <Card className="gap-6 p-6">
+    <Card className="gap-6 rounded-xl p-5 sm:p-8">
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Connexion</h1>
-        <p className="text-sm text-muted-foreground">Accédez à la trésorerie de votre entreprise.</p>
+        <h1 className="text-3xl font-medium tracking-tight">Connexion</h1>
+        <p className="text-sm text-muted-foreground">Consultez les soldes et les prévisions de votre entreprise</p>
       </div>
       {error && (
         <Alert tone="danger">
@@ -59,26 +59,25 @@ export function LoginForm({ demoAccounts }: { demoAccounts: { email: string; lab
           {pending ? 'Connexion…' : 'Se connecter'}
         </Button>
       </form>
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-sm text-muted-foreground">
         Pas encore de compte ?{' '}
         <Link href="/register" className="font-medium text-primary hover:underline">
           Créer un compte
         </Link>
       </p>
       {demoAccounts.length > 0 && (
-        <Alert tone="info">
-          <Info />
-          <AlertDescription>
-            <p className="mb-1 font-medium">Comptes de démonstration (mot de passe dans le README)</p>
-            <ul className="space-y-0.5">
-              {demoAccounts.map((a) => (
-                <li key={a.email}>
-                  <span className="font-mono text-xs">{a.email}</span> — {a.label}
-                </li>
-              ))}
-            </ul>
-          </AlertDescription>
-        </Alert>
+        <details className="border-t pt-4 text-sm text-muted-foreground">
+          <summary className="cursor-pointer rounded-sm font-medium text-foreground focus-visible:outline-2 focus-visible:outline-ring">Comptes de démonstration</summary>
+          <p className="mt-3 text-xs">Mot de passe indiqué dans le README</p>
+          <ul className="mt-3 space-y-2">
+            {demoAccounts.map((a) => (
+              <li key={a.email}>
+                <span className="block text-xs font-medium text-foreground">{a.label}</span>
+                <span className="break-all font-mono text-xs">{a.email}</span>
+              </li>
+            ))}
+          </ul>
+        </details>
       )}
     </Card>
   );
@@ -116,9 +115,9 @@ export function RegisterForm() {
   }
 
   return (
-    <Card className="gap-6 p-6">
+    <Card className="gap-6 rounded-xl p-5 sm:p-8">
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Créer un compte</h1>
+        <h1 className="text-3xl font-medium tracking-tight">Créer un compte</h1>
         <p className="text-sm text-muted-foreground">Vous pourrez ensuite créer votre entreprise ou être invité dans une autre.</p>
       </div>
       {error && (
@@ -144,7 +143,7 @@ export function RegisterForm() {
           {pending ? 'Création…' : 'Créer mon compte'}
         </Button>
       </form>
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-sm text-muted-foreground">
         Déjà inscrit ?{' '}
         <Link href="/login" className="font-medium text-primary hover:underline">
           Se connecter

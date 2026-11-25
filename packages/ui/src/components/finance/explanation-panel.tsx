@@ -45,7 +45,7 @@ export function ExplanationPanel({
         <Calculator className="size-4 text-muted-foreground" aria-hidden />
         <h2 className="text-base font-semibold">Comment ce montant est calculé — {formatDate(date, 'long')}</h2>
       </div>
-      <div className="grid grid-cols-2 items-end gap-3 rounded-md bg-muted/60 p-3 text-sm md:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr]">
+      <div className="grid grid-cols-2 items-end gap-3 rounded-md bg-muted/60 p-3 text-sm xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)]">
         <Term label={`Solde réel au ${formatDate(realAsOf, 'short')}`} value={realBalanceMillimes} />
         <Op>+</Op>
         <Term label="Encaissements attendus" value={expectedInMillimes} />
@@ -81,7 +81,7 @@ export function ExplanationPanel({
       )}
       <div className="flex flex-wrap gap-2" aria-label="Hypothèses utilisées">
         {assumptions.map((a) => (
-          <Badge key={a} tone="outline">
+          <Badge key={a} tone="outline" className="max-w-full whitespace-normal">
             {a}
           </Badge>
         ))}
@@ -92,16 +92,16 @@ export function ExplanationPanel({
 
 function Term({ label, value, strong }: { label: string; value: number; strong?: boolean }) {
   return (
-    <div className="space-y-0.5">
+    <div className="min-w-0 space-y-0.5">
       <p className="text-xs text-muted-foreground">{label}</p>
-      <Amount value={value} tone={strong ? 'balance' : 'neutral'} size={strong ? 'lg' : 'md'} />
+      <Amount value={value} tone={strong ? 'balance' : 'neutral'} size={strong ? 'lg' : 'md'} className="whitespace-normal wrap-anywhere" />
     </div>
   );
 }
 
 function Op({ children }: { children: React.ReactNode }) {
   return (
-    <span aria-hidden className="hidden pb-0.5 text-lg text-muted-foreground md:block">
+    <span aria-hidden className="hidden pb-0.5 text-lg text-muted-foreground xl:block">
       {children}
     </span>
   );

@@ -29,6 +29,7 @@ import {
   UserRound,
   Users,
   Wallet,
+  type LucideIcon,
 } from 'lucide-react';
 import {
   Avatar,
@@ -60,7 +61,7 @@ import { useLocalStorage } from '@/hooks';
 import { authClient } from '@/lib/auth-client';
 import { type NavGroup, type NavIcon } from '@/lib/nav';
 
-const ICONS: Record<NavIcon, React.ComponentType<{ className?: string }>> = {
+const ICONS: Record<NavIcon, LucideIcon> = {
   dashboard: Gauge,
   forecast: LineChart,
   simulation: Calculator,
@@ -129,7 +130,7 @@ export function AppShell({ company, companies, user, roleLabel, nav, alertCount,
       <div className="flex min-h-dvh">
         <aside
           className={cn(
-            'sticky top-0 hidden h-dvh shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-out md:flex',
+            'sticky top-0 hidden h-dvh shrink-0 flex-col border-r bg-sidebar text-sidebar-foreground md:flex',
             collapsed ? 'w-14' : 'w-64',
           )}
           aria-label="Navigation principale"
@@ -157,19 +158,19 @@ export function AppShell({ company, companies, user, roleLabel, nav, alertCount,
         </Sheet>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background/90 px-4 backdrop-blur md:px-6">
+          <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-background px-3 md:px-6 lg:px-8">
             <Button variant="ghost" size="icon" className="md:hidden" aria-label="Ouvrir le menu" onClick={() => setMobileOpen(true)}>
               <Menu />
             </Button>
             <CompanySwitcher company={company} companies={companies} />
             <div className="flex-1" />
-            <Button variant="outline" size="sm" className="hidden gap-2 text-muted-foreground sm:inline-flex" onClick={() => setPaletteOpen(true)}>
-              Rechercher… <Kbd>Ctrl K</Kbd>
+            <Button variant="outline" size="sm" className="hidden gap-2 bg-card text-muted-foreground sm:inline-flex" onClick={() => setPaletteOpen(true)}>
+              Rechercher <Kbd>Ctrl K</Kbd>
             </Button>
             {quickActions.length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button size="sm">
+                  <Button size="sm" aria-label="Nouveau">
                     <Plus /> <span className="hidden sm:inline">Nouveau</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -201,7 +202,7 @@ export function AppShell({ company, companies, user, roleLabel, nav, alertCount,
             <ThemeToggle />
             <UserMenu user={user} roleLabel={roleLabel} />
           </header>
-          <main id="main" tabIndex={-1} className="flex-1 px-4 py-6 outline-none md:px-6 lg:px-8">
+          <main id="main" tabIndex={-1} className="flex-1 px-4 py-6 outline-none md:px-6 lg:px-8 lg:py-8">
             {children}
           </main>
         </div>
@@ -219,16 +220,16 @@ function SidebarContent({ company, nav, collapsed, pathname }: { company: ShellP
     .sort((a, b) => b.length - a.length)[0];
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className={cn('flex h-14 items-center gap-2 border-b px-4', collapsed && 'justify-center px-0')}>
-        <span className="flex size-8 items-center justify-center rounded-md bg-primary text-primary-foreground" aria-hidden>
+      <div className={cn('flex h-14 shrink-0 items-center gap-3 border-b px-4', collapsed && 'justify-center px-0')}>
+        <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground" aria-hidden>
           <ArrowLeftRight className="size-4" />
         </span>
-        {!collapsed && <span className="text-base font-semibold tracking-tight">CashPilot</span>}
+        {!collapsed && <span className="text-base font-semibold">CashPilot</span>}
       </div>
-      <nav className="flex-1 overflow-y-auto p-2" aria-label={company.name}>
+      <nav className="flex-1 space-y-4 overflow-y-auto px-3 py-4" aria-label={company.name}>
         {nav.map((group) => (
-          <div key={group.label} className="mb-3">
-            {!collapsed && <p className="px-2 pt-2 pb-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">{group.label}</p>}
+          <div key={group.label} className="space-y-1">
+            {!collapsed && <p className="px-2 pb-1 text-xs font-medium text-muted-foreground">{group.label}</p>}
             <ul className="space-y-0.5">
               {group.items.map((item) => {
                 const href = `/${company.slug}/${item.path}`;
@@ -239,12 +240,12 @@ function SidebarContent({ company, nav, collapsed, pathname }: { company: ShellP
                     href={href as Route}
                     aria-current={active ? 'page' : undefined}
                     className={cn(
-                      'flex h-9 items-center gap-3 rounded-md px-2 text-sm transition-colors outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring',
-                      active ? 'bg-accent font-medium text-accent-foreground' : 'text-sidebar-foreground/80',
+                      'flex h-8 items-center gap-2.5 rounded-md px-2 text-sm transition-colors outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset max-md:h-10',
+                      active ? 'bg-accent font-medium text-accent-foreground ring-1 ring-border ring-inset' : 'text-sidebar-foreground/80',
                       collapsed && 'justify-center px-0',
                     )}
                   >
-                    <Icon className="size-5 shrink-0" aria-hidden />
+                    <Icon className="size-4 shrink-0" strokeWidth={1.5} aria-hidden />
                     {collapsed ? <span className="sr-only">{item.label}</span> : item.label}
                   </Link>
                 );
@@ -272,7 +273,7 @@ function CompanySwitcher({ company, companies }: Pick<ShellProps, 'company' | 'c
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="max-w-[55vw] gap-2 px-2" aria-label={`Entreprise : ${company.name}. Changer d'entreprise`}>
+        <Button variant="ghost" className="min-w-0 max-w-[40vw] gap-2 px-2 sm:max-w-64" aria-label={`Entreprise : ${company.name}. Changer d'entreprise`}>
           <Building2 className="text-muted-foreground" />
           <span className="truncate font-medium">{company.name}</span>
           <ChevronsUpDown className="text-muted-foreground" />

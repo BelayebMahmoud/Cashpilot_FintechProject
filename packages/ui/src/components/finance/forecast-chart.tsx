@@ -92,8 +92,6 @@ export function ForecastChart({
     ...(scenarioPoints?.[i] ? { sim: scenarioPoints[i]!.balanceMillimes, simKeys: scenarioPoints[i]!.flowKeys } : {}),
   }));
   const summary = summarizeProjection(scenarioPoints ?? points, shortfalls);
-  const horizon = points.length - 1;
-  const tickInterval = horizon <= 31 ? 4 : horizon <= 61 ? 9 : 14;
 
   return (
     <div className={cn('space-y-2', className)}>
@@ -107,21 +105,21 @@ export function ForecastChart({
               if (label && onSelectDate) onSelectDate(String(label));
             }}
           >
-            <CartesianGrid vertical={false} stroke="var(--chart-grid)" />
+            <CartesianGrid vertical={false} stroke="var(--chart-grid)" strokeDasharray="3 4" />
             <XAxis
               dataKey="date"
               tickFormatter={(d: string) => formatDate(d, 'short')}
-              interval={tickInterval}
-              tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
+              interval="preserveStartEnd" minTickGap={24}
+              tick={{ fontSize: 11, fontFamily: 'var(--font-geist-mono)', fill: 'var(--muted-foreground)' }}
               tickLine={false}
               axisLine={{ stroke: 'var(--border)' }}
             />
             <YAxis
               tickFormatter={(v: number) => compactMoney(v)}
-              tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
+              tick={{ fontSize: 11, fontFamily: 'var(--font-geist-mono)', fill: 'var(--muted-foreground)' }}
               tickLine={false}
               axisLine={false}
-              width={72}
+              width={60}
               tickCount={5}
               domain={[(min: number) => Math.min(0, min), (max: number) => Math.max(0, max)]}
             />
@@ -145,8 +143,8 @@ export function ForecastChart({
               type="stepAfter"
               dataKey="base"
               name="Prévision"
-              stroke="var(--chart-baseline)"
-              strokeWidth={2}
+              stroke="var(--chart-baseline)" strokeLinejoin="round"
+              strokeWidth={2.5}
               isAnimationActive={false}
               dot={(props: { cx?: number; cy?: number; payload?: Row; index?: number }) => <FlowDot key={`b${props.index}`} {...props} />}
               activeDot={{ r: 4 }}
@@ -157,7 +155,7 @@ export function ForecastChart({
                 dataKey="sim"
                 name="Scénario"
                 stroke="var(--chart-scenario)"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 strokeDasharray="4 4"
                 isAnimationActive={false}
                 dot={false}
@@ -167,7 +165,7 @@ export function ForecastChart({
           </ComposedChart>
         </ResponsiveContainer>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t pt-2 text-xs text-muted-foreground">
         <div className="flex flex-wrap items-center gap-4" aria-hidden>
           <span className="inline-flex items-center gap-1.5">
             <span className="h-0.5 w-5 bg-chart-baseline" /> Prévision

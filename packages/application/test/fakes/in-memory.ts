@@ -1,5 +1,5 @@
 import {
-  CashMovement,
+  type CashMovement,
   Company,
   DomainError,
   Expense,

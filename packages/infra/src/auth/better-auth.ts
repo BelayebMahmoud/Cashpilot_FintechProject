@@ -14,6 +14,8 @@ export interface AuthOptions {
   baseURL: string;
   /** Postgres via Prisma, or the in-memory store (DEMO_IN_MEMORY=1). */
   storage: { kind: 'prisma'; prisma: PrismaClient } | { kind: 'memory' };
+  /** Login/sign-up rate limiting (default on). Only E2E runs turn it off. */
+  rateLimit?: boolean;
   /** Called after an account is created (in-memory mode mirrors users into the app's UserDirectory). */
   onUserCreated?: (user: UserView) => void | Promise<void>;
 }
@@ -30,7 +32,7 @@ export function createAuth(options: AuthOptions) {
     session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 },
     // Login brute-force protection
     rateLimit: {
-      enabled: true,
+      enabled: options.rateLimit ?? true,
       window: 60,
       max: 100,
       customRules: { '/sign-in/email': { window: 60, max: 5 }, '/sign-up/email': { window: 60, max: 5 } },

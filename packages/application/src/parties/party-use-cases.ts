@@ -114,6 +114,8 @@ export interface ListPartiesInput {
   kind: PartyKind;
   q?: string;
   page?: number;
+  /** Larger pages for pickers (selects); lists keep the default 25. */
+  pageSize?: number;
   includeArchived?: boolean;
 }
 
@@ -130,7 +132,7 @@ export class ListParties {
         .map(toPartyDto)
         .filter((p) => matchesQuery(input.q, p.name, p.email, p.taxId, p.phone))
         .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
-      return ok(paginate(filtered, input.page));
+      return ok(paginate(filtered, input.page, Math.min(input.pageSize ?? 25, 1000)));
     });
   }
 }

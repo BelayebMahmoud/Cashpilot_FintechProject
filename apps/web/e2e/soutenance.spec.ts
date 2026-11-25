@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { DEMO, DEMO_PASSWORD, isoDay, login, logout, RECEIPT_PNG, register, unique } from './helpers';
+import { DEMO, isoDay, login, logout, RECEIPT_PNG, register, unique } from './helpers';
 
 /**
  * The brief's defense scenario, end to end:
@@ -102,8 +102,8 @@ test('soutenance: from company creation to the what-if comparison', async ({ pag
 
   // 8. Compare: the lowest point drops by the delayed 2 000 DT; the end balance is unchanged
   const strip = page.getByRole('region', { name: 'Comparaison prévision / scénario' });
-  await expect(strip.getByText(/2\s000,000 DT/).first()).toBeVisible();
-  await expect(strip.getByText(/−2\s000,000 DT/)).toBeVisible();
+  await expect(strip.getByText(/2\s000,000\sDT/).first()).toBeVisible();
+  await expect(strip.getByText(/−2\s000,000\sDT/)).toBeVisible();
   await expect(strip.getByText('inchangé')).toBeVisible();
 
   // saving the scenario never touches real data
@@ -112,5 +112,4 @@ test('soutenance: from company creation to the what-if comparison', async ({ pag
   await expect(page).toHaveURL(new RegExp(`/${slug}/simulations/[\\w-]+$`));
   await page.goto(`/${slug}/treasury`);
   await expect(page.getByText(/6\s000,000/).first()).toBeVisible();
-  void DEMO_PASSWORD;
 });

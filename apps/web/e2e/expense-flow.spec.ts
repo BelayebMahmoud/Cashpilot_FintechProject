@@ -33,7 +33,7 @@ test('expense flow: submit → reject with reason → cannot be paid', async ({ 
   await login(page, DEMO.finance);
   await page.goto('/atlas-digital/expenses?tab=rejected');
   await page.getByRole('link', { name: label }).first().click();
-  await expect(page.getByText('Trajet personnel')).toBeVisible();
+  await expect(page.getByText('Trajet personnel').first()).toBeVisible();
   await expect(page.getByRole('button', { name: 'Marquer comme payée' })).toHaveCount(0);
   await page.context().clearCookies();
 

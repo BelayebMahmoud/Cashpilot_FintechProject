@@ -25,7 +25,7 @@ test('mobile 375 px: invoice list shows cards, not a wide table', async ({ page 
   await login(page, DEMO.finance);
   await page.goto('/atlas-digital/invoices');
   await expect(page.getByRole('table')).toBeHidden();
-  await expect(page.getByText('Reste à payer').first()).toBeVisible();
+  await expect(page.getByRole('listitem').getByText('Reste à payer').first()).toBeVisible();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(1);
 });

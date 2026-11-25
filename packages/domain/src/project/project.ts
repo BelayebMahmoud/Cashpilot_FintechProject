@@ -1,7 +1,7 @@
 import { DomainError } from '../shared/errors';
 import { cleanText, type CompanyId, type InvoiceId, type PartyId, type ProjectId } from '../shared/id';
 import { type LocalDate } from '../shared/local-date';
-import { Money } from '../shared/money';
+import { type Money } from '../shared/money';
 
 /**
  * Sector feature — digital agency: client projects with a budget, payment milestones

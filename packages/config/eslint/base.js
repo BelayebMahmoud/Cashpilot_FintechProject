@@ -13,6 +13,8 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       '@typescript-eslint/consistent-type-imports': ['warn', { fixStyle: 'inline-type-imports' }],
       'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
+      // fr-TN formatting legitimately uses narrow no-break spaces in strings and comments
+      'no-irregular-whitespace': ['error', { skipStrings: true, skipComments: true, skipTemplates: true, skipRegExps: true, skipJSXText: true }],
     },
   },
 );

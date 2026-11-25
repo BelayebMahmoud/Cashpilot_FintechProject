@@ -1,6 +1,6 @@
 import { DomainError, invariant } from '../shared/errors';
 import { type CompanyId } from '../shared/id';
-import { LocalDate } from '../shared/local-date';
+import { type LocalDate } from '../shared/local-date';
 import { Money } from '../shared/money';
 
 export const SECTORS = ['DIGITAL_AGENCY', 'TRAINING_CENTER', 'RETAIL', 'SERVICES'] as const;

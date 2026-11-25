@@ -8,6 +8,7 @@
     "./tsconfig/*": "./tsconfig/*",
     "./eslint/base": "./eslint/base.js",
     "./eslint/next": "./eslint/next.js",
+    "./eslint/react": "./eslint/react.js",
     "./vitest/preset": "./vitest/preset.ts"
   },
   "scripts": {

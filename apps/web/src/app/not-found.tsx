@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { SearchX } from 'lucide-react';
+import { ArrowLeft, SearchX } from 'lucide-react';
 import { Button } from '@cashpilot/ui';
 
 export default function NotFound() {
@@ -9,7 +9,10 @@ export default function NotFound() {
       <h1 className="text-2xl font-semibold">Page introuvable</h1>
       <p className="max-w-md text-muted-foreground">Cette ressource n&apos;existe pas ou vous n&apos;y avez pas accès.</p>
       <Button asChild variant="outline">
-        <Link href="/">Retour à l&apos;accueil</Link>
+        <Link href="/">
+          <ArrowLeft className="size-4" aria-hidden />
+          Retour à l&apos;accueil
+        </Link>
       </Button>
     </main>
   );

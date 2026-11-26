@@ -16,6 +16,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <main id="main" className="flex flex-1 items-start justify-center px-4 py-12 sm:items-center sm:px-6 sm:py-16">
         <div className="w-full max-w-md">{children}</div>
       </main>
+      <footer className="border-t px-4 py-4 text-center text-xs text-muted-foreground md:px-8">
+        © {new Date().getFullYear()} CashPilot · Gestion et prévision de trésorerie
+      </footer>
     </div>
   );
 }
